@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@CrossOrigin("http://localhost:3000")
 @RestController
 @RequestMapping("/students")
 public class StudentController {
@@ -47,12 +47,26 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<StudentDTO> update(@PathVariable Integer id, @RequestBody Student s) {
-        if (sRepo.existsById(id)) {
-            Student updated = sRepo.save(s);
-            return ResponseEntity.ok(new StudentDTO(updated.getStudent_id(), updated.getName(), updated.getEmail(), updated.getStatus()));
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<StudentDTO> update(@PathVariable Integer id, @RequestBody Student updatedStudent) {
+        return sRepo.findById(id)
+            .map(existingStudent -> {
+                
+                existingStudent.setName(updatedStudent.getName());
+                existingStudent.setEmail(updatedStudent.getEmail());
+                existingStudent.setStatus(updatedStudent.getStatus());
+
+               
+                Student savedStudent = sRepo.save(existingStudent);
+
+                
+                return ResponseEntity.ok(new StudentDTO(
+                    savedStudent.getStudent_id(),
+                    savedStudent.getName(),
+                    savedStudent.getEmail(),
+                    savedStudent.getStatus()
+                ));
+            })
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

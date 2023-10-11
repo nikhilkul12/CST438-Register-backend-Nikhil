@@ -1,5 +1,8 @@
 package com.cst438.service;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public interface GradebookService {
 	/*
 	 * A student has add a course.  Send message to other services.
